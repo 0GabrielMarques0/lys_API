@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/lys_db
+      - SPRING_DATASOURCE_USERNAME=lys_admin
+      - SPRING_DATASOURCE_PASSWORD=159
+    networks:
+      - lys-network
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=lys_db
+      - POSTGRES_USER=lys_admin
+      - POSTGRES_PASSWORD=159
+    networks:
+      - lys-network
+
+networks:
+  lys-network:
