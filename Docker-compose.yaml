@@ -9,21 +9,26 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/lys_db
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/lys_db?useSSL=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=lys_admin
       - SPRING_DATASOURCE_PASSWORD=159
     networks:
       - lys-network
   db:
-    image: postgres
+    image: mysql:8.1.0
+    container_name: lys_db
     ports:
-      - "5432:5432"
+      - "3308:3306"
     environment:
-      - POSTGRES_DB=lys_db
-      - POSTGRES_USER=lys_admin
-      - POSTGRES_PASSWORD=159
-    networks:
-      - lys-network
-
+      - MYSQL_DATABASE=lys_db
+      - MYSQL_USER=lys_admin
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./mysql:/var/lib/mysql
 networks:
   lys-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.0.0/24
