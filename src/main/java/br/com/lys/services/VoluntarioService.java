@@ -24,7 +24,23 @@ public class VoluntarioService {
     public List <Voluntario> findAll (){
         return voluntarioRepository.findAll();
     }
-
-
-
+    public Voluntario update (Long id, Voluntario voluntario) {
+        var voluntarioAux = voluntarioRepository.findById(id).orElse(null);
+        if (voluntarioAux == null) {
+            return null;
+        }
+        if (voluntario.getNome() != null) {
+            voluntarioAux.setNome(voluntario.getNome());
+        }
+        if (voluntario.getEmail() != null) {
+            voluntarioAux.setEmail(voluntario.getEmail());
+        }
+        if (voluntario.getSenha() != null) {
+            voluntarioAux.setSenha(voluntario.getSenha());
+        }
+        if (voluntario.getTelefone() != null) {
+            voluntarioAux.setTelefone(voluntario.getTelefone());
+        }
+        return voluntarioAux;
+    }
 }

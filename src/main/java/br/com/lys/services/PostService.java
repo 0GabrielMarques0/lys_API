@@ -24,4 +24,14 @@ public class PostService {
     public List <Post> findall (){
         return postRepository.findAll();
     }
+    public Post update (Long id, Post post){
+        var postAux = postRepository.findById(id).orElse(null);
+        if(postAux == null){
+            return null;
+        }
+        if ( post.getTexto() != null){
+            postAux.setTexto(post.getTexto());
+        }
+        return postRepository.save(postAux);
+    }
 }

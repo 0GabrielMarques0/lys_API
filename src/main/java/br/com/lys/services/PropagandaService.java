@@ -24,6 +24,25 @@ public class PropagandaService {
     public List <Propaganda> findAll (){
         return propagandaRepository.findAll();
     }
+    public Propaganda update (Long id, Propaganda propaganda){
+        var propagandaAux = propagandaRepository.findById(id).orElse(null);
+        if(propagandaAux == null){
+            return null;
+        }
+        if ( propaganda.getNome() != null){
+            propagandaAux.setNome(propaganda.getNome());
+        }
+        if ( propaganda.getDescricao() != null){
+            propagandaAux.setDescricao(propaganda.getDescricao());
+        }
+        if ( propaganda.getAnexo() != null){
+            propagandaAux.setAnexo(propaganda.getAnexo());
+        }
+        if ( propaganda.getLink() != null){
+            propagandaAux.setLink(propaganda.getLink());
+        }
+        return propagandaRepository.save(propagandaAux);
+    }
 
 
 
