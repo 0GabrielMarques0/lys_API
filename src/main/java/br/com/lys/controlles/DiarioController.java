@@ -13,6 +13,7 @@ public class DiarioController {
 
     @Autowired
     private DiarioService diarioService;
+
     @PostMapping
     public ResponseEntity<DiarioDetails> save(@RequestBody DiarioRecord diario, UriComponentsBuilder builder){
         var diarioAux = diarioService.create(diario.toDiario());

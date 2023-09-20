@@ -25,4 +25,26 @@ public class ParceiroService {
     public List <Parceiro> findAll (){
         return parceiroRepository.findAll();
     }
+    public Parceiro update (Long id, Parceiro parceiro){
+        var parceiroAux = parceiroRepository.findById(id).orElse(null);
+        if(parceiroAux == null){
+            return null;
+        }
+        if ( parceiro.getNome() != null){
+            parceiroAux.setNome(parceiro.getNome());
+        }
+        if ( parceiro.getTelefone() != null){
+            parceiroAux.setTelefone(parceiro.getTelefone());
+        }
+        if ( parceiro.getEmail() != null){
+            parceiroAux.setEmail(parceiro.getEmail());
+        }
+        if ( parceiro.getSenha() != null){
+            parceiroAux.setSenha(parceiro.getSenha());
+        }
+        if ( parceiro.getCnpj() != null){
+            parceiroAux.setCnpj(parceiro.getCnpj());
+        }
+        return parceiroRepository.save(parceiroAux);
+    }
 }

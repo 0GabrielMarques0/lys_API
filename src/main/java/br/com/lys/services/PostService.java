@@ -21,7 +21,7 @@ public class PostService {
     public void delete (Long id){
         postRepository.deleteById(id);
     }
-    public List <Post> findall (){
+    public List <Post> findAll (){
         return postRepository.findAll();
     }
     public Post update (Long id, Post post){

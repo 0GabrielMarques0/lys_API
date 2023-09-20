@@ -16,6 +16,7 @@ public class Post {
     private String texto;
     private String titulo;
     private String anexo;
+    private String data;
 
     @ManyToOne
     @JoinColumn(name = "id_voluntario")

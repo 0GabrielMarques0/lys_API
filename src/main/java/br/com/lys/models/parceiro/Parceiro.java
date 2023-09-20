@@ -13,4 +13,7 @@ public class Parceiro extends Pessoa {
     }
     public Parceiro() {
     }
+
+    public Parceiro(Long id, String nome, String telefone, String email, String endereco, String cidade, String estado, String cep, String cnpj) {
+    }
 }

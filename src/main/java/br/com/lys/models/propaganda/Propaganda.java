@@ -13,13 +13,17 @@ import lombok.NoArgsConstructor;
 
 public class Propaganda {
     @Id
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private Long id;
     private String nome;
     private String descricao;
     private String anexo;
     private String link;
+    private String data;
+
 
     @ManyToOne
     @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
+
 }

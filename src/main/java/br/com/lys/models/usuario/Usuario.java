@@ -5,6 +5,11 @@ import jakarta.persistence.Entity;
 @Entity
 
 public class Usuario extends Pessoa {
+
     public Usuario() {
+    }
+
+    public Usuario(Long id, String nome, String email, String telefone, String senha) {
+        super(id, nome, email, telefone, senha);
     }
 }
