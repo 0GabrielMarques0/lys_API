@@ -2,12 +2,14 @@ package br.com.lys.services;
 
 import br.com.lys.models.usuario.Usuario;
 import br.com.lys.repositories.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UsuarioService {
+    @Autowired
     private UsuarioRepository usuarioRepository;
     public Usuario create (Usuario usuario){
         return usuarioRepository.save(usuario);
