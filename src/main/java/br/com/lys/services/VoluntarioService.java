@@ -4,6 +4,8 @@ import br.com.lys.models.usuario.Usuario;
 import br.com.lys.models.voluntario.Voluntario;
 import br.com.lys.repositories.VoluntarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +23,8 @@ public class VoluntarioService {
     public void delete (Long id){
         voluntarioRepository.deleteById(id);
     }
-    public List <Voluntario> findAll (){
-        return voluntarioRepository.findAll();
+    public Page<Voluntario> findAll (Pageable page){
+        return voluntarioRepository.findAll(page);
     }
     public Voluntario update (Long id, Voluntario voluntario) {
         var voluntarioAux = voluntarioRepository.findById(id).orElse(null);

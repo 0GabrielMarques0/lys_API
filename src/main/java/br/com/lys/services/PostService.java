@@ -3,6 +3,8 @@ package br.com.lys.services;
 import br.com.lys.models.post.Post;
 import br.com.lys.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +23,8 @@ public class PostService {
     public void delete (Long id){
         postRepository.deleteById(id);
     }
-    public List <Post> findAll (){
-        return postRepository.findAll();
+    public Page<Post> findAll (Pageable page){
+        return postRepository.findAll(page);
     }
     public Post update (Long id, Post post){
         var postAux = postRepository.findById(id).orElse(null);

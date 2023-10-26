@@ -4,6 +4,8 @@ import br.com.lys.models.propaganda.Propaganda;
 import br.com.lys.repositories.ParceiroRepository;
 import br.com.lys.repositories.PropagandaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +23,8 @@ public class PropagandaService {
     public void delete (Long id){
         propagandaRepository.deleteById(id);
     }
-    public List <Propaganda> findAll (){
-        return propagandaRepository.findAll();
+    public Page<Propaganda> findAll (Pageable page){
+        return propagandaRepository.findAll(page);
     }
     public Propaganda update (Long id, Propaganda propaganda){
         var propagandaAux = propagandaRepository.findById(id).orElse(null);

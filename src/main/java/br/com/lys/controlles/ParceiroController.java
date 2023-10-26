@@ -4,6 +4,8 @@ import br.com.lys.models.parceiro.ParceiroDetails;
 import br.com.lys.models.parceiro.ParceiroRecord;
 import br.com.lys.services.ParceiroService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,8 +35,8 @@ public class ParceiroController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping
-    public ResponseEntity<?> findAll(){
-        var parceiros = parceiroService.findAll();
+    public ResponseEntity findAll(@PageableDefault Pageable page){
+        var parceiros = parceiroService.findAll(page);
         if(parceiros.isEmpty()){
             return ResponseEntity.noContent().build();
         }

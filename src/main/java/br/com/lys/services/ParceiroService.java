@@ -3,6 +3,8 @@ package br.com.lys.services;
 import br.com.lys.models.parceiro.Parceiro;
 import br.com.lys.repositories.ParceiroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class ParceiroService {
     public void delete (Long id){
         parceiroRepository.deleteById(id);
     }
-    public List <Parceiro> findAll (){
-        return parceiroRepository.findAll();
+    public Page<Parceiro> findAll (Pageable page){
+        return parceiroRepository.findAll(page);
     }
     public Parceiro update (Long id, Parceiro parceiro){
         var parceiroAux = parceiroRepository.findById(id).orElse(null);

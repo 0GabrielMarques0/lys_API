@@ -4,6 +4,8 @@ import br.com.lys.models.voluntario.VoluntarioDetails;
 import br.com.lys.models.voluntario.VoluntarioRecord;
 import br.com.lys.services.VoluntarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,8 +34,8 @@ private VoluntarioService voluntarioService;
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(){
-        var voluntarios = voluntarioService.findAll();
+    public ResponseEntity<?> findAll(@PageableDefault Pageable page){
+        var voluntarios = voluntarioService.findAll(page);
         if(voluntarios.isEmpty()){
             return ResponseEntity.noContent().build();
         }

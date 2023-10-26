@@ -3,6 +3,8 @@ package br.com.lys.services;
 import br.com.lys.models.usuario.Usuario;
 import br.com.lys.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +22,8 @@ public class UsuarioService {
     public void delete (Long id){
         usuarioRepository.deleteById(id);
     }
-    public List <Usuario> findAll (){
-        return usuarioRepository.findAll();
+    public Page<Usuario> findAll (Pageable page){
+        return usuarioRepository.findAll(page);
     }
     public Usuario update (Long id, Usuario usuario){
         var usuarioAux = usuarioRepository.findById(id).orElse(null);

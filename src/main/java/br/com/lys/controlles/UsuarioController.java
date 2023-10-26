@@ -4,6 +4,8 @@ import br.com.lys.models.usuario.UsuarioDetails;
 import br.com.lys.models.usuario.UsuarioRecord;
 import br.com.lys.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,8 +35,8 @@ public class UsuarioController {
         }
 
         @GetMapping
-        public ResponseEntity<?> findAll(){
-            var usuarios = usuarioService.findAll();
+        public ResponseEntity<?> findAll(@PageableDefault Pageable page){
+            var usuarios = usuarioService.findAll(page);
             if(usuarios.isEmpty()){
                 return ResponseEntity.noContent().build();
             }

@@ -4,6 +4,8 @@ import br.com.lys.models.propaganda.PropagandaDetails;
 import br.com.lys.models.propaganda.PropagandaRecord;
 import br.com.lys.services.PropagandaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -39,8 +41,8 @@ public class PropagandaController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(){
-        var propagandas = propagandaService.findAll();
+    public ResponseEntity<?> findAll(@PageableDefault Pageable page){
+        var propagandas = propagandaService.findAll(page);
         if(propagandas.isEmpty()){
             return ResponseEntity.noContent().build();
         }
