@@ -36,6 +36,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("com.mysql:mysql-connector-j:8.1.0")
+    implementation("org.modelmapper:modelmapper:3.2.0")
 }
 
 tasks.withType<Test> {

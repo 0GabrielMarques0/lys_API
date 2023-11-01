@@ -11,8 +11,11 @@ import java.util.List;
 
 @Service
 public class PostService {
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     public Post create (Post post){
         return postRepository.save(post);

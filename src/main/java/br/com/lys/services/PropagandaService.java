@@ -12,8 +12,12 @@ import java.util.List;
 
 @Service
 public class PropagandaService {
-    @Autowired
-    private PropagandaRepository propagandaRepository;
+
+    private final PropagandaRepository propagandaRepository;
+
+    public PropagandaService(PropagandaRepository propagandaRepository) {
+        this.propagandaRepository = propagandaRepository;
+    }
     public Propaganda create (Propaganda propaganda){
         return propagandaRepository.save(propaganda);
     }

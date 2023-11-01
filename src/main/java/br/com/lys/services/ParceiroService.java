@@ -2,6 +2,7 @@ package br.com.lys.services;
 
 import br.com.lys.models.parceiro.Parceiro;
 import br.com.lys.repositories.ParceiroRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +13,14 @@ import java.util.List;
 @Service
 
 public class ParceiroService {
-    @Autowired
-    private ParceiroRepository parceiroRepository;
+
+    private final ParceiroRepository parceiroRepository;
+    private final ModelMapper modelMapper;
+
+    public ParceiroService(ParceiroRepository parceiroRepository, ModelMapper modelMapper) {
+        this.parceiroRepository = parceiroRepository;
+        this.modelMapper = modelMapper;
+    }
 
     public Parceiro create (Parceiro parceiro){
         return parceiroRepository.save(parceiro);
@@ -29,24 +36,12 @@ public class ParceiroService {
     }
     public Parceiro update (Long id, Parceiro parceiro){
         var parceiroAux = parceiroRepository.findById(id).orElse(null);
-        if(parceiroAux == null){
-            return null;
-        }
-        if ( parceiro.getNome() != null){
-            parceiroAux.setNome(parceiro.getNome());
-        }
-        if ( parceiro.getTelefone() != null){
-            parceiroAux.setTelefone(parceiro.getTelefone());
-        }
-        if ( parceiro.getEmail() != null){
-            parceiroAux.setEmail(parceiro.getEmail());
-        }
-        if ( parceiro.getSenha() != null){
-            parceiroAux.setSenha(parceiro.getSenha());
-        }
-        if ( parceiro.getCnpj() != null){
-            parceiroAux.setCnpj(parceiro.getCnpj());
-        }
-        return parceiroRepository.save(parceiroAux);
+       if(parceiroAux != null){
+           modelMapper.map(parceiro, parceiroAux);
+           return parceiroRepository.save(parceiroAux);
+       }else {
+           throw new RuntimeException("Parceiro não encontrado");
+       }
+
     }
 }

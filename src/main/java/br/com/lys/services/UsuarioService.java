@@ -11,8 +11,13 @@ import java.util.List;
 
 @Service
 public class UsuarioService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+
+    private final UsuarioRepository usuarioRepository;
+
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+
     public Usuario create (Usuario usuario){
         return usuarioRepository.save(usuario);
     }

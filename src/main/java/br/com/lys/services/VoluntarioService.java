@@ -12,8 +12,12 @@ import java.util.List;
 
 @Service
 public class VoluntarioService {
-    @Autowired
-    private VoluntarioRepository voluntarioRepository;
+
+    private final VoluntarioRepository voluntarioRepository;
+
+    public VoluntarioService(VoluntarioRepository voluntarioRepository) {
+        this.voluntarioRepository = voluntarioRepository;
+    }
     public Voluntario create (Voluntario voluntario){
         return voluntarioRepository.save(voluntario);
     }
