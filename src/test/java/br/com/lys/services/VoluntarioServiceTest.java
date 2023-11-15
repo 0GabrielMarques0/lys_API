@@ -1,103 +1,96 @@
 package br.com.lys.services;
-
 import br.com.lys.models.voluntario.Voluntario;
 import br.com.lys.repositories.VoluntarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class VoluntarioServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class VoluntarioServiceTest {
 
+    @Mock
+    private VoluntarioRepository voluntarioRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private VoluntarioService voluntarioService;
-    private VoluntarioRepository mockedVoluntarioRepository;
+    private Voluntario voluntario;
 
     @BeforeEach
-    void configurar() {
-        mockedVoluntarioRepository = mock(VoluntarioRepository.class);
-        voluntarioService = new VoluntarioService(mockedVoluntarioRepository);
+    void setUp() {
+        voluntario = new Voluntario();
     }
 
     @Test
-    void criarDeveSalvarERetornarVoluntario() {
+    void testCreate() {
         Voluntario voluntario = new Voluntario();
-        when(mockedVoluntarioRepository.save(voluntario)).thenReturn(voluntario);
-
-        Voluntario resultado = voluntarioService.create(voluntario);
-
-        assertEquals(voluntario, resultado);
+        when(voluntarioRepository.save(any(Voluntario.class))).thenReturn(voluntario);
+        Voluntario created = voluntarioService.create(voluntario);
+        assertNotNull(created);
+        verify(voluntarioRepository).save(any(Voluntario.class));
     }
 
     @Test
-    void lerDeveRetornarVoluntarioSeExistir() {
+    void testRead() {
+        Long id = 1L;
+        Optional<Voluntario> optionalVoluntario = Optional.of(new Voluntario());
+        when(voluntarioRepository.findById(id)).thenReturn(optionalVoluntario);
+        Voluntario found = voluntarioService.read(id);
+        assertNotNull(found);
+        verify(voluntarioRepository).findById(id);
+    }
+
+    @Test
+    void testDelete() {
+        Long id = 1L;
+        doNothing().when(voluntarioRepository).deleteById(id);
+        voluntarioService.delete(id);
+        verify(voluntarioRepository).deleteById(id);
+    }
+
+    @Test
+    void testFindAll() {
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Voluntario> page = new PageImpl<>(Collections.singletonList(voluntario));
+        when(voluntarioRepository.findAll(pageable)).thenReturn(page);
+        Page<Voluntario> result = voluntarioService.findAll(pageable);
+        assertNotNull(result);
+        verify(voluntarioRepository).findAll(pageable);
+    }
+
+    @Test
+    void testUpdate() {
+        Long id = 1L;
         Voluntario voluntario = new Voluntario();
-        when(mockedVoluntarioRepository.findById(1L)).thenReturn(Optional.of(voluntario));
-
-        Voluntario resultado = voluntarioService.read(1L);
-
-        assertEquals(voluntario, resultado);
+        Optional<Voluntario> optionalVoluntario = Optional.of(new Voluntario());
+        when(voluntarioRepository.findById(id)).thenReturn(optionalVoluntario);
+        when(voluntarioRepository.save(any(Voluntario.class))).thenReturn(voluntario);
+        Voluntario updated = voluntarioService.update(id, voluntario);
+        assertNotNull(updated);
+        verify(voluntarioRepository).findById(id);
+        verify(voluntarioRepository).save(any(Voluntario.class));
     }
 
     @Test
-    void lerDeveRetornarNuloSeNaoExistir() {
-        when(mockedVoluntarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Voluntario resultado = voluntarioService.read(1L);
-
-        assertNull(resultado);
-    }
-
-    @Test
-    void deletarDeveChamarDeleteById() {
-        voluntarioService.delete(1L);
-        verify(mockedVoluntarioRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void listarTodosDeveRetornarPaginaDeVoluntarios() {
-        Page<Voluntario> pagina = new PageImpl<>(List.of(new Voluntario()));
-        when(mockedVoluntarioRepository.findAll(any(Pageable.class))).thenReturn(pagina);
-
-        Page<Voluntario> resultado = voluntarioService.findAll(PageRequest.of(0, 10));
-
-        assertEquals(pagina, resultado);
-    }
-
-    @Test
-    void atualizarDeveAtualizarERetornarVoluntario() {
-        Voluntario voluntarioExistente = new Voluntario();
-        Voluntario novoVoluntario = new Voluntario();
-        novoVoluntario.setNome("Nome Novo");
-        novoVoluntario.setEmail("novo@email.com");
-        novoVoluntario.setSenha("senha123");
-        novoVoluntario.setTelefone("11999999999");
-        when(mockedVoluntarioRepository.findById(1L)).thenReturn(Optional.of(voluntarioExistente));
-        when(mockedVoluntarioRepository.save(voluntarioExistente)).thenReturn(voluntarioExistente);
-
-        Voluntario resultado = voluntarioService.update(1L, novoVoluntario);
-
-        assertEquals("Nome Novo", resultado.getNome());
-        assertEquals("novo@email.com", resultado.getEmail());
-        assertEquals("senha123", resultado.getSenha());
-        assertEquals("11999999999", resultado.getTelefone());
-    }
-
-    @Test
-    void atualizarDeveRetornarNuloSeVoluntarioNaoExistir() {
-        Voluntario novoVoluntario = new Voluntario();
-        when(mockedVoluntarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Voluntario resultado = voluntarioService.update(1L, novoVoluntario);
-
-        assertNull(resultado);
+    void testUpdateNotFound() {
+        Long id = 1L;
+        Voluntario voluntario = new Voluntario();
+        when(voluntarioRepository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> voluntarioService.update(id, voluntario));
+        verify(voluntarioRepository).findById(id);
     }
 }

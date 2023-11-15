@@ -1,23 +1,20 @@
 package br.com.lys.services;
 
-import br.com.lys.models.usuario.Usuario;
 import br.com.lys.models.voluntario.Voluntario;
 import br.com.lys.repositories.VoluntarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class VoluntarioService {
 
     private final VoluntarioRepository voluntarioRepository;
+    private final ModelMapper modelMapper;
 
-    public VoluntarioService(VoluntarioRepository voluntarioRepository) {
-        this.voluntarioRepository = voluntarioRepository;
-    }
     public Voluntario create (Voluntario voluntario){
         return voluntarioRepository.save(voluntario);
     }
@@ -31,22 +28,12 @@ public class VoluntarioService {
         return voluntarioRepository.findAll(page);
     }
     public Voluntario update (Long id, Voluntario voluntario) {
-        var voluntarioAux = voluntarioRepository.findById(id).orElse(null);
-        if (voluntarioAux == null) {
-            return null;
+        var voluntarioAux = voluntarioRepository.findById(id);
+        if (voluntarioAux.isPresent()) {
+            modelMapper.map(voluntario, voluntarioAux.get());
+            return voluntarioRepository.save(voluntarioAux.get());
+        } else {
+            throw new RuntimeException("Voluntario não encontrado");
         }
-        if (voluntario.getNome() != null) {
-            voluntarioAux.setNome(voluntario.getNome());
-        }
-        if (voluntario.getEmail() != null) {
-            voluntarioAux.setEmail(voluntario.getEmail());
-        }
-        if (voluntario.getSenha() != null) {
-            voluntarioAux.setSenha(voluntario.getSenha());
-        }
-        if (voluntario.getTelefone() != null) {
-            voluntarioAux.setTelefone(voluntario.getTelefone());
-        }
-        return voluntarioAux;
     }
 }

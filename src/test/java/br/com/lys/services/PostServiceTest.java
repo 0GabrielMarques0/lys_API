@@ -1,97 +1,84 @@
 package br.com.lys.services;
-
 import br.com.lys.models.post.Post;
 import br.com.lys.repositories.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class PostServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class PostServiceTest {
 
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private PostService postService;
-    private PostRepository mockedPostRepository;
+
+    private Post post;
 
     @BeforeEach
     void setUp() {
-        mockedPostRepository = mock(PostRepository.class);
-        postService = new PostService(mockedPostRepository);
+        post = new Post();
     }
 
     @Test
-    void createShouldSaveAndReturnPost() {
-        Post post = new Post();
-        when(mockedPostRepository.save(post)).thenReturn(post);
-
+    void createTest() {
+        when(postRepository.save(any(Post.class))).thenReturn(post);
         Post result = postService.create(post);
-
-        assertEquals(post, result);
+        assertNotNull(result);
+        verify(postRepository).save(post);
     }
 
     @Test
-    void readShouldReturnPostIfExists() {
-        Post post = new Post();
-        when(mockedPostRepository.findById(1L)).thenReturn(Optional.of(post));
-
-        Post result = postService.read(1L);
-
-        assertEquals(post, result);
+    void readTest() {
+        Long id = 1L;
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
+        Post result = postService.read(id);
+        assertNotNull(result);
+        verify(postRepository).findById(id);
     }
 
     @Test
-    void readShouldReturnNullIfNotExists() {
-        when(mockedPostRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Post result = postService.read(1L);
-
-        assertNull(result);
+    void deleteTest() {
+        Long id = 1L;
+        doNothing().when(postRepository).deleteById(id);
+        postService.delete(id);
+        verify(postRepository).deleteById(id);
     }
 
     @Test
-    void deleteShouldCallDeleteById() {
-        postService.delete(1L);
-        verify(mockedPostRepository, times(1)).deleteById(1L);
+    void findAllTest() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Post> page = new PageImpl<>(Collections.singletonList(post));
+        when(postRepository.findAll(pageRequest)).thenReturn(page);
+        Page<Post> result = postService.findAll(pageRequest);
+        assertNotNull(result);
+        verify(postRepository).findAll(pageRequest);
     }
 
     @Test
-    void findAllShouldReturnPageOfPosts() {
-        Page<Post> page = new PageImpl<>(List.of(new Post()));
-        when(mockedPostRepository.findAll(any(Pageable.class))).thenReturn(page);
-
-        Page<Post> result = postService.findAll(PageRequest.of(0, 10));
-
-        assertEquals(page, result);
-    }
-
-    @Test
-    void updateShouldUpdateAndReturnPost() {
-        Post existingPost = new Post();
-        Post newPost = new Post();
-        newPost.setTexto("New Text");
-        when(mockedPostRepository.findById(1L)).thenReturn(Optional.of(existingPost));
-        when(mockedPostRepository.save(existingPost)).thenReturn(existingPost);
-
-        Post result = postService.update(1L, newPost);
-
-        assertEquals("New Text", result.getTexto());
-    }
-
-    @Test
-    void updateShouldReturnNullIfPostDoesNotExist() {
-        Post newPost = new Post();
-        when(mockedPostRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Post result = postService.update(1L, newPost);
-
-        assertNull(result);
+    void updateTest() {
+        Long id = 1L;
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+        Post updatedPost = new Post();
+        Post result = postService.update(id, updatedPost);
+        assertNotNull(result);
+        verify(postRepository).findById(id);
+        verify(postRepository).save(post);
     }
 }

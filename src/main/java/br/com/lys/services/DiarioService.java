@@ -1,6 +1,8 @@
 package br.com.lys.services;
 import br.com.lys.models.diario.Diario;
 import br.com.lys.repositories.DiarioRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -8,15 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-
+@RequiredArgsConstructor
 @Service
 public class DiarioService {
 
     private final DiarioRepository diarioRepository;
 
-    public DiarioService(DiarioRepository diarioRepository) {
-        this.diarioRepository = diarioRepository;
-    }
+
+    private final ModelMapper modelMapper;
+
 
     @Cacheable(value = "diario", key = "#diario.id")
     public Diario create (Diario diario){
@@ -40,13 +42,12 @@ public class DiarioService {
 
     @CachePut(value = "diario", key = "#id")
     public Diario update (Long id, Diario diario){
-        var diarioAux = diarioRepository.findById(id).orElse(null);
-        if(diarioAux == null){
-            return null;
+        var diarioAux = diarioRepository.findById(id);
+        if(diarioAux.isPresent()){
+            modelMapper.map(diario, diarioAux.get());
+            return diarioRepository.save(diarioAux.get());
+        }else {
+            throw new RuntimeException("Diario não encontrado");
         }
-        if ( diario.getTexto() != null){
-            diarioAux.setTexto(diario.getTexto());
-        }
-        return diarioRepository.save(diarioAux);
     }
 }

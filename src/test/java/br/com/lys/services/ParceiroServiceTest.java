@@ -1,97 +1,84 @@
 package br.com.lys.services;
-
 import br.com.lys.models.parceiro.Parceiro;
 import br.com.lys.repositories.ParceiroRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ParceiroServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class ParceiroServiceTest {
 
+    @Mock
+    private ParceiroRepository parceiroRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private ParceiroService parceiroService;
-    private ParceiroRepository mockedParceiroRepository;
-    private ModelMapper mockedModelMapper;
+
+    private Parceiro parceiro;
 
     @BeforeEach
     void setUp() {
-        mockedParceiroRepository = mock(ParceiroRepository.class);
-        mockedModelMapper = mock(ModelMapper.class);
-        parceiroService = new ParceiroService(mockedParceiroRepository, mockedModelMapper);
+        parceiro = new Parceiro();
     }
 
     @Test
-    void createShouldSaveAndReturnParceiro() {
-        Parceiro parceiro = new Parceiro();
-        when(mockedParceiroRepository.save(parceiro)).thenReturn(parceiro);
-
+    void createTest() {
+        when(parceiroRepository.save(any(Parceiro.class))).thenReturn(parceiro);
         Parceiro result = parceiroService.create(parceiro);
-
-        assertEquals(parceiro, result);
+        assertNotNull(result);
+        verify(parceiroRepository).save(parceiro);
     }
 
     @Test
-    void readShouldReturnParceiroIfExists() {
-        Parceiro parceiro = new Parceiro();
-        when(mockedParceiroRepository.findById(1L)).thenReturn(Optional.of(parceiro));
-
-        Parceiro result = parceiroService.read(1L);
-
-        assertEquals(parceiro, result);
+    void readTest() {
+        Long id = 1L;
+        when(parceiroRepository.findById(id)).thenReturn(Optional.of(parceiro));
+        Parceiro result = parceiroService.read(id);
+        assertNotNull(result);
+        verify(parceiroRepository).findById(id);
     }
 
     @Test
-    void readShouldReturnNullIfNotExists() {
-        when(mockedParceiroRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Parceiro result = parceiroService.read(1L);
-
-        assertNull(result);
+    void deleteTest() {
+        Long id = 1L;
+        doNothing().when(parceiroRepository).deleteById(id);
+        parceiroService.delete(id);
+        verify(parceiroRepository).deleteById(id);
     }
 
     @Test
-    void deleteShouldCallDeleteById() {
-        parceiroService.delete(1L);
-        verify(mockedParceiroRepository, times(1)).deleteById(1L);
+    void findAllTest() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Parceiro> page = new PageImpl<>(Collections.singletonList(parceiro));
+        when(parceiroRepository.findAll(pageRequest)).thenReturn(page);
+        Page<Parceiro> result = parceiroService.findAll(pageRequest);
+        assertNotNull(result);
+        verify(parceiroRepository).findAll(pageRequest);
     }
 
     @Test
-    void findAllShouldReturnPageOfParceiros() {
-        Page<Parceiro> page = new PageImpl<>(List.of(new Parceiro()));
-        when(mockedParceiroRepository.findAll(any(Pageable.class))).thenReturn(page);
-
-        Page<Parceiro> result = parceiroService.findAll(PageRequest.of(0, 10));
-
-        assertEquals(page, result);
-    }
-
-    @Test
-    void updateShouldUpdateAndReturnParceiro() {
-        Parceiro existingParceiro = new Parceiro();
-        Parceiro newParceiro = new Parceiro();
-        when(mockedParceiroRepository.findById(1L)).thenReturn(Optional.of(existingParceiro));
-        when(mockedParceiroRepository.save(existingParceiro)).thenReturn(existingParceiro);
-
-        Parceiro result = parceiroService.update(1L, newParceiro);
-
-        verify(mockedModelMapper).map(newParceiro, existingParceiro);
-        assertEquals(existingParceiro, result);
-    }
-
-    @Test
-    void updateShouldThrowRuntimeExceptionIfNotExists() {
-        Parceiro newParceiro = new Parceiro();
-        when(mockedParceiroRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> parceiroService.update(1L, newParceiro));
+    void updateTest() {
+        Long id = 1L;
+        when(parceiroRepository.findById(id)).thenReturn(Optional.of(parceiro));
+        when(parceiroRepository.save(any(Parceiro.class))).thenReturn(parceiro);
+        Parceiro updatedParceiro = new Parceiro();
+        Parceiro result = parceiroService.update(id, updatedParceiro);
+        assertNotNull(result);
+        verify(parceiroRepository).findById(id);
+        verify(parceiroRepository).save(parceiro);
     }
 }

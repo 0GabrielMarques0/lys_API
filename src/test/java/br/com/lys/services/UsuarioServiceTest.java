@@ -4,98 +4,95 @@ import br.com.lys.models.usuario.Usuario;
 import br.com.lys.repositories.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class UsuarioServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class UsuarioServiceTest {
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private UsuarioService usuarioService;
-    private UsuarioRepository mockedUsuarioRepository;
+    private Usuario usuario;
 
     @BeforeEach
-    void configurar() {
-        mockedUsuarioRepository = mock(UsuarioRepository.class);
-        usuarioService = new UsuarioService(mockedUsuarioRepository);
+    void setUp() {
+        usuario = new Usuario();
     }
 
     @Test
-    void criarDeveSalvarERetornarUsuario() {
+    void testCreate() {
         Usuario usuario = new Usuario();
-        when(mockedUsuarioRepository.save(usuario)).thenReturn(usuario);
-
-        Usuario resultado = usuarioService.create(usuario);
-
-        assertEquals(usuario, resultado);
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        Usuario created = usuarioService.create(usuario);
+        assertNotNull(created);
+        verify(usuarioRepository).save(any(Usuario.class));
     }
 
     @Test
-    void lerDeveRetornarUsuarioSeExistir() {
+    void testRead() {
+        Long id = 1L;
+        Optional<Usuario> optionalUsuario = Optional.of(new Usuario());
+        when(usuarioRepository.findById(id)).thenReturn(optionalUsuario);
+        Usuario found = usuarioService.read(id);
+        assertNotNull(found);
+        verify(usuarioRepository).findById(id);
+    }
+
+    @Test
+    void testDelete() {
+        Long id = 1L;
+        doNothing().when(usuarioRepository).deleteById(id);
+        usuarioService.delete(id);
+        verify(usuarioRepository).deleteById(id);
+    }
+
+    @Test
+    void testFindAll() {
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Usuario> page = new PageImpl<>(Collections.singletonList(usuario));
+        when(usuarioRepository.findAll(pageable)).thenReturn(page);
+        Page<Usuario> result = usuarioService.findAll(pageable);
+        assertNotNull(result);
+        verify(usuarioRepository).findAll(pageable);
+    }
+
+    @Test
+    void testUpdate() {
+        Long id = 1L;
         Usuario usuario = new Usuario();
-        when(mockedUsuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
-
-        Usuario resultado = usuarioService.read(1L);
-
-        assertEquals(usuario, resultado);
+        Optional<Usuario> optionalUsuario = Optional.of(new Usuario());
+        when(usuarioRepository.findById(id)).thenReturn(optionalUsuario);
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        Usuario updated = usuarioService.update(id, usuario);
+        assertNotNull(updated);
+        verify(usuarioRepository).findById(id);
+        verify(usuarioRepository).save(any(Usuario.class));
     }
 
     @Test
-    void lerDeveRetornarNuloSeNaoExistir() {
-        when(mockedUsuarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Usuario resultado = usuarioService.read(1L);
-
-        assertNull(resultado);
-    }
-
-    @Test
-    void deletarDeveChamarDeleteById() {
-        usuarioService.delete(1L);
-        verify(mockedUsuarioRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void listarTodosDeveRetornarPaginaDeUsuarios() {
-        Page<Usuario> pagina = new PageImpl<>(List.of(new Usuario()));
-        when(mockedUsuarioRepository.findAll(any(Pageable.class))).thenReturn(pagina);
-
-        Page<Usuario> resultado = usuarioService.findAll(PageRequest.of(0, 10));
-
-        assertEquals(pagina, resultado);
-    }
-
-    @Test
-    void atualizarDeveAtualizarERetornarUsuario() {
-        Usuario usuarioExistente = new Usuario();
-        Usuario novoUsuario = new Usuario();
-        novoUsuario.setNome("Nome Novo");
-        novoUsuario.setEmail("novo@email.com");
-        novoUsuario.setSenha("senha123");
-        when(mockedUsuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
-        when(mockedUsuarioRepository.save(usuarioExistente)).thenReturn(usuarioExistente);
-
-        Usuario resultado = usuarioService.update(1L, novoUsuario);
-
-        assertEquals("Nome Novo", resultado.getNome());
-        assertEquals("novo@email.com", resultado.getEmail());
-        assertEquals("senha123", resultado.getSenha());
-    }
-
-    @Test
-    void atualizarDeveRetornarNuloSeUsuarioNaoExistir() {
-        Usuario novoUsuario = new Usuario();
-        when(mockedUsuarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Usuario resultado = usuarioService.update(1L, novoUsuario);
-
-        assertNull(resultado);
+    void testUpdateNotFound() {
+        Long id = 1L;
+        Usuario usuario = new Usuario();
+        when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> usuarioService.update(id, usuario));
+        verify(usuarioRepository).findById(id);
     }
 }

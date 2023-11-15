@@ -2,48 +2,46 @@ package br.com.lys.services;
 
 import br.com.lys.models.usuario.Usuario;
 import br.com.lys.repositories.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
-    }
-
+    private final ModelMapper modelMapper;
+    @Cacheable(value = "usuario", key = "#usuario.id")
     public Usuario create (Usuario usuario){
         return usuarioRepository.save(usuario);
     }
+    @Cacheable(value = "usuario", key = "#id")
     public Usuario read (Long id){
         return usuarioRepository.findById(id).orElse(null);
     }
+    @CacheEvict(value = "usuario", key = "#id")
     public void delete (Long id){
         usuarioRepository.deleteById(id);
     }
+    @Cacheable(value = "usuario", key = "#page.pageNumber")
     public Page<Usuario> findAll (Pageable page){
         return usuarioRepository.findAll(page);
     }
-    public Usuario update (Long id, Usuario usuario){
-        var usuarioAux = usuarioRepository.findById(id).orElse(null);
-        if(usuarioAux == null){
-            return null;
+    @CachePut(value = "usuario", key = "#id")
+    public Usuario update (Long id, Usuario usuario) {
+        var usuarioAux = usuarioRepository.findById(id);
+        if (usuarioAux.isPresent()) {
+            modelMapper.map(usuario, usuarioAux.get());
+            return usuarioRepository.save(usuarioAux.get());
+        } else {
+            throw new RuntimeException("Usuario não encontrado");
         }
-        if ( usuario.getNome() != null){
-            usuarioAux.setNome(usuario.getNome());
-        }
-        if ( usuario.getEmail() != null){
-            usuarioAux.setEmail(usuario.getEmail());
-        }
-        if ( usuario.getSenha() != null){
-            usuarioAux.setSenha(usuario.getSenha());
-        }
-        return usuarioRepository.save(usuarioAux);
     }
 }
