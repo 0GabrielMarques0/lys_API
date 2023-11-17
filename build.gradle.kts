@@ -38,6 +38,8 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.1.0")
     implementation("org.modelmapper:modelmapper:3.2.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0")
 }
 

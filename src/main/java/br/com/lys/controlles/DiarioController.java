@@ -55,6 +55,4 @@ public class DiarioController {
         }
         return ResponseEntity.ok(new DiarioDetails(diarioAux));
     }
-
-
 }
